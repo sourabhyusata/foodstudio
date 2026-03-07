@@ -1,64 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase';
+import { randomUUID } from 'crypto';
+import { db } from '@/lib/db';
 
-// POST /api/auth — Handle authentication
+// POST /api/auth — Handle authentication (local mock for sandbox testing)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { phone, action, otp, name } = body;
+    const { phone, action, name } = body;
 
     if (!phone) {
       return NextResponse.json({ error: 'Phone number is required' }, { status: 400 });
     }
 
-    const supabase = createServerClient();
-
     if (action === 'send_otp') {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: phone.startsWith('+') ? phone : `+91${phone}`,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      return NextResponse.json({ message: 'OTP sent successfully' });
+      // In local mode, OTP is always 123456
+      return NextResponse.json({ message: 'OTP sent successfully (use 123456 for local testing)' });
     }
 
     if (action === 'verify_otp') {
+      const { otp } = body;
       if (!otp) {
         return NextResponse.json({ error: 'OTP is required' }, { status: 400 });
       }
 
-      const { data, error } = await supabase.auth.verifyOtp({
-        phone: phone.startsWith('+') ? phone : `+91${phone}`,
-        token: otp,
-        type: 'sms',
+      // Accept any OTP in local testing mode
+      if (otp !== '123456') {
+        return NextResponse.json({ error: 'Invalid OTP. Use 123456 for local testing.' }, { status: 401 });
+      }
+
+      const userId = randomUUID();
+
+      // Upsert user profile
+      db.userProfiles.upsert({
+        id: userId,
+        phone,
+        name: name || '',
       });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.user) {
-        await supabase
-          .from('user_profiles')
-          .upsert({
-            id: data.user.id,
-            phone: phone,
-            name: name || '',
-          }, { onConflict: 'id' });
-      }
 
       return NextResponse.json({
         message: 'OTP verified',
         user: {
-          id: data.user?.id,
+          id: userId,
           phone,
           name: name || '',
           verified: true,
         },
-        session: data.session,
+        session: { access_token: `local-token-${userId}` },
       });
     }
 
