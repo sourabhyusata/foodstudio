@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { Utensils, Clock, IndianRupee, Flame } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
@@ -30,15 +32,23 @@ const highlights = [
 ];
 
 async function getBestsellers(): Promise<MenuItem[]> {
-  const { data, error } = await supabase
-    .from('menu_items')
-    .select('*')
-    .eq('is_bestseller', true)
-    .eq('is_available', true)
-    .limit(6);
+  try {
+    const { data, error } = await supabase
+      .from('menu_items')
+      .select('*')
+      .eq('is_bestseller', true)
+      .eq('is_available', true)
+      .limit(6);
 
-  if (error) {
-    throw new Error(error.message);
+    if (error) {
+      console.error('Failed to fetch bestsellers:', error.message);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Failed to fetch bestsellers:', error);
+    return [];
   }
 
   return data || [];

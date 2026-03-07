@@ -10,8 +10,6 @@ SET search_path TO foodstudio, public;
 -- Clear existing data
 TRUNCATE TABLE foodstudio.menu_items CASCADE;
 TRUNCATE TABLE foodstudio.admin_credentials CASCADE;
-TRUNCATE TABLE menu_items CASCADE;
-TRUNCATE TABLE admin_credentials CASCADE;
 
 INSERT INTO foodstudio.menu_items (name, description, price, category, image_url, is_veg, is_available, is_bestseller, is_chefs_special) VALUES
 
@@ -41,5 +39,4 @@ INSERT INTO foodstudio.menu_items (name, description, price, category, image_url
 
 
 INSERT INTO foodstudio.admin_credentials (username, password_hash, is_active) VALUES
-INSERT INTO admin_credentials (username, password_hash, is_active) VALUES
 ('admin', '308b9eb79dbd40596d99f4c31a8bfc8b:552a691dd31faa6f5cc517f3af05b293b4fe947b0a75aefd12f81396be73f4ce76cffce788568a6f1584675fbe14927ee63e68fd7cc0f5a5c7e3dd7c49a28fa3', true);
