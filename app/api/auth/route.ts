@@ -13,8 +13,15 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'send_otp') {
-      // In local mode, OTP is always 123456
-      return NextResponse.json({ message: 'OTP sent successfully (use 123456 for local testing)' });
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: phone.startsWith('+') ? phone : `+91${phone}`,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      return NextResponse.json({ message: 'OTP sent successfully' });
     }
 
     if (action === 'verify_otp') {
@@ -23,19 +30,25 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'OTP is required' }, { status: 400 });
       }
 
-      // Accept any OTP in local testing mode
-      if (otp !== '123456') {
-        return NextResponse.json({ error: 'Invalid OTP. Use 123456 for local testing.' }, { status: 401 });
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone: phone.startsWith('+') ? phone : `+91${phone}`,
+        token: otp,
+        type: 'sms',
+      });
+
+      if (error) {
+        throw error;
       }
 
-      const userId = randomUUID();
-
-      // Upsert user profile
-      db.userProfiles.upsert({
-        id: userId,
-        phone,
-        name: name || '',
-      });
+      if (data.user) {
+        await supabase
+          .from('user_profiles')
+          .upsert({
+            id: data.user.id,
+            phone: phone,
+            name: name || '',
+          }, { onConflict: 'id' });
+      }
 
       return NextResponse.json({
         message: 'OTP verified',

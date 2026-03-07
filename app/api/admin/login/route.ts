@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@/lib/supabase';
 import { verifyPassword } from '@/lib/admin-auth';
 import { createAdminSessionToken } from '@/lib/admin-session';
-import { db } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,13 +16,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Admin session is not configured' }, { status: 500 });
     }
 
-    const data = db.adminCredentials.getByUsername(username);
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from('admin_credentials')
+      .select('id, username, password_hash, is_active')
+      .eq('username', username)
+      .single();
 
-    if (!data || !data.is_active || !verifyPassword(password, data.password_hash as string)) {
+    if (error || !data || !data.is_active || !verifyPassword(password, data.password_hash)) {
       return NextResponse.json({ error: 'Invalid admin credentials' }, { status: 401 });
     }
 
-    const token = await createAdminSessionToken(data.username as string, sessionSecret);
+    const token = await createAdminSessionToken(data.username, sessionSecret);
 
     const response = NextResponse.json({ message: 'Login successful' });
     response.cookies.set('admin_session', token, {

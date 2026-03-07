@@ -5,7 +5,7 @@ import { Utensils, Clock, IndianRupee, Flame } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
 import TestimonialCarousel from '@/components/TestimonialCarousel';
 import HomeBestsellers from './HomeBestsellers';
-import { db } from '@/lib/db';
+import { menuItems } from '@/lib/menu-data';
 import { MenuItem } from '@/types';
 
 const highlights = [
@@ -31,18 +31,14 @@ const highlights = [
   },
 ];
 
-async function getBestsellers(): Promise<MenuItem[]> {
-  try {
-    const items = db.menuItems.getAll({ available: true });
-    return items.filter(i => i.is_bestseller).slice(0, 6) as unknown as MenuItem[];
-  } catch (error) {
-    console.error('Failed to fetch bestsellers:', error);
-    return [];
-  }
+function getBestsellers(): MenuItem[] {
+  return menuItems
+    .filter((item) => item.is_bestseller && item.is_available)
+    .slice(0, 6);
 }
 
-export default async function HomePage() {
-  const bestsellers = await getBestsellers();
+export default function HomePage() {
+  const bestsellers = getBestsellers();
 
   return (
     <>
