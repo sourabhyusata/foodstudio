@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase';
+import { db } from '@/lib/db';
 
 // POST /api/orders — Create a new order
 export async function POST(request: NextRequest) {
@@ -28,32 +28,24 @@ export async function POST(request: NextRequest) {
 
     const order_number = `DD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
-    const supabase = createServerClient();
-
-    const { data, error } = await supabase
-      .from('orders')
-      .insert({
-        order_number,
-        user_phone,
-        customer_name: customer_name || '',
-        items,
-        subtotal,
-        tax,
-        delivery_charge,
-        total,
-        order_type,
-        delivery_address: delivery_address || null,
-        status: 'received',
-        payment_method,
-        payment_status: 'pending',
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
+    const order = db.orders.insert({
+      order_number,
+      user_phone,
+      customer_name: customer_name || '',
+      items,
+      subtotal,
+      tax,
+      delivery_charge,
+      total,
+      order_type,
+      delivery_address: delivery_address || null,
+      status: 'received',
+      payment_method,
+      payment_status: 'pending',
+    });
 
     return NextResponse.json(
-      { message: 'Order created', order: data },
+      { message: 'Order created', order },
       { status: 201 }
     );
   } catch (err) {
@@ -72,20 +64,13 @@ export async function GET(request: NextRequest) {
   const status = searchParams.get('status');
 
   try {
-    const supabase = createServerClient();
-    let query = supabase
-      .from('orders')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const filters: { phone?: string; status?: string } = {};
+    if (phone) filters.phone = phone;
+    if (status) filters.status = status;
 
-    if (phone) query = query.eq('user_phone', phone);
-    if (status) query = query.eq('status', status);
+    const orders = db.orders.getAll(filters);
 
-    const { data, error } = await query;
-
-    if (error) throw error;
-
-    return NextResponse.json({ orders: data || [] });
+    return NextResponse.json({ orders });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to fetch orders';
     return NextResponse.json({ error: message }, { status: 500 });

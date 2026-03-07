@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase';
+import { randomUUID } from 'crypto';
+import { db } from '@/lib/db';
 
-// POST /api/auth — Handle authentication
+// POST /api/auth — Handle authentication (local mock for sandbox testing)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { phone, action, otp, name } = body;
+    const { phone, action, name } = body;
 
     if (!phone) {
       return NextResponse.json({ error: 'Phone number is required' }, { status: 400 });
     }
-
-    const supabase = createServerClient();
 
     if (action === 'send_otp') {
       const { error } = await supabase.auth.signInWithOtp({
@@ -26,6 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'verify_otp') {
+      const { otp } = body;
       if (!otp) {
         return NextResponse.json({ error: 'OTP is required' }, { status: 400 });
       }
@@ -53,12 +53,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         message: 'OTP verified',
         user: {
-          id: data.user?.id,
+          id: userId,
           phone,
           name: name || '',
           verified: true,
         },
-        session: data.session,
+        session: { access_token: `local-token-${userId}` },
       });
     }
 
