@@ -71,6 +71,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 NEXT_PUBLIC_SUPABASE_DB_SCHEMA=foodstudio
 ADMIN_SESSION_SECRET=generate-a-long-random-secret
+DATABASE_URL=postgresql://postgres.<project-ref>:<password>@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
 
 # Razorpay
 NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
@@ -88,8 +89,19 @@ NEXT_PUBLIC_WHATSAPP_NUMBER=919876543210
 
 1. Create a new Supabase project
 2. In **Supabase Dashboard → API Settings**, expose the `foodstudio` schema in exposed schemas.
-3. Run the schema migration in the Supabase SQL Editor: `supabase/schema.sql`
-4. Seed the menu/admin data: `supabase/seed.sql`
+3. Run the complete one-time setup SQL: `supabase/init.sql`
+4. (Optional) Re-seed only data later with: `supabase/seed.sql`
+
+### Run DB setup with one SQL file
+
+Use this single file for first-time DB setup:
+
+```bash
+psql "$DATABASE_URL" -f supabase/init.sql
+```
+
+If you use Supabase SQL Editor instead, paste `supabase/init.sql` and run once.
+
 
 ## Project Structure
 
@@ -128,6 +140,7 @@ NEXT_PUBLIC_WHATSAPP_NUMBER=919876543210
 ├── types/
 │   └── index.ts            # TypeScript interfaces
 ├── supabase/
+│   ├── init.sql            # One-shot setup (schema + policies + seed)
 │   ├── schema.sql          # Full database schema with RLS
 │   └── seed.sql            # Menu seed data (68 items)
 └── public/
