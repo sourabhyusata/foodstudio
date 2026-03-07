@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display:ital@0;1&display=swap');
+@import "tailwindcss";
+
+@theme inline {
+  --color-saffron: #E8922F;
+  --color-saffron-light: #F5B041;
+  --color-saffron-dark: #C27A1A;
+  --color-curry-red: #C0392B;
+  --color-curry-dark: #922B21;
+  --color-leaf-green: #27AE60;
+  --color-leaf-dark: #1E8449;
+  --color-cream: #FFF8F0;
+  --color-cream-dark: #F5E6D3;
+  --color-brown: #5D4037;
+  --color-brown-light: #795548;
+  --color-brown-dark: #3E2723;
+
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-cream);
+  color: #2D2D2D;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-cream);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-saffron);
+  border-radius: 4px;
+}
+
+.kolam-border {
+  background-image:
+    radial-gradient(circle at 50% 0%, var(--color-saffron) 3px, transparent 3px),
+    radial-gradient(circle at 0% 50%, var(--color-saffron) 3px, transparent 3px),
+    radial-gradient(circle at 100% 50%, var(--color-saffron) 3px, transparent 3px),
+    radial-gradient(circle at 50% 100%, var(--color-saffron) 3px, transparent 3px);
+  background-size: 20px 20px;
+  background-position: top center, left center, right center, bottom center;
+  background-repeat: repeat-x, repeat-y, repeat-y, repeat-x;
+}
+
+@keyframes sizzle {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-2px); }
+  75% { transform: translateY(1px); }
+}
+.sizzle-hover:hover {
+  animation: sizzle 0.3s ease-in-out;
+}
+
+.banana-leaf-bg {
+  background: linear-gradient(135deg, #1a5c2a 0%, #27AE60 50%, #1a5c2a 100%);
+  position: relative;
+}
+.banana-leaf-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg, transparent, transparent 60px,
+    rgba(255,255,255,0.03) 60px, rgba(255,255,255,0.03) 61px
+  );
+}
+
+.veg-dot {
+  width: 14px; height: 14px;
+  border: 2px solid #27AE60;
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+}
+.veg-dot::after {
+  content: ''; width: 8px; height: 8px;
+  border-radius: 50%; background: #27AE60;
+}
+.nonveg-dot {
+  width: 14px; height: 14px;
+  border: 2px solid #C0392B;
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+}
+.nonveg-dot::after {
+  content: ''; width: 8px; height: 8px;
+  border-radius: 50%; background: #C0392B;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.5s ease forwards;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.cart-slide-in {
+  animation: slideInRight 0.3s ease forwards;
+}
+
+.temple-arch {
+  border-radius: 50% 50% 0 0;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-saffron), var(--color-curry-red));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
