@@ -26,7 +26,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="/images/logo.png"
+              src="/images/logo.svg"
               alt="Dosa Darbar Logo"
               width={48}
               height={48}
@@ -81,7 +81,7 @@ export default function Navbar() {
 
             {/* Admin Login Button */}
             <Link
-              href="/admin"
+              href="/admin/login"
               className="hidden sm:flex items-center gap-1.5 text-sm bg-brown-dark hover:bg-brown text-white px-3 py-1.5 rounded-lg transition-colors"
             >
               <Lock size={14} />
@@ -122,7 +122,7 @@ export default function Navbar() {
               +91 97851 32125
             </a>
             <Link
-              href="/admin"
+              href="/admin/login"
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-2 px-3 py-2.5 text-brown-dark hover:bg-cream rounded-lg transition-colors font-medium"
             >

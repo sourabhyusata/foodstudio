@@ -1,3 +1,7 @@
+-- Create and use dedicated application schema
+CREATE SCHEMA IF NOT EXISTS foodstudio;
+SET search_path TO foodstudio, public;
+
 -- =============================================
 -- Dosa Darbar — Supabase Database Schema
 -- =============================================
@@ -8,7 +12,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- =============================================
 -- MENU ITEMS
 -- =============================================
-CREATE TABLE menu_items (
+CREATE TABLE foodstudio.menu_items (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
   description TEXT NOT NULL DEFAULT '',
@@ -28,13 +32,13 @@ CREATE TABLE menu_items (
 );
 
 -- Index for fast category filtering
-CREATE INDEX idx_menu_items_category ON menu_items (category);
-CREATE INDEX idx_menu_items_available ON menu_items (is_available);
+CREATE INDEX idx_menu_items_category ON foodstudio.menu_items (category);
+CREATE INDEX idx_menu_items_available ON foodstudio.menu_items (is_available);
 
 -- =============================================
 -- ORDERS
 -- =============================================
-CREATE TABLE orders (
+CREATE TABLE foodstudio.orders (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   order_number TEXT UNIQUE NOT NULL,
   user_phone TEXT NOT NULL,
@@ -60,14 +64,14 @@ CREATE TABLE orders (
 );
 
 -- Indexes
-CREATE INDEX idx_orders_status ON orders (status);
-CREATE INDEX idx_orders_user_phone ON orders (user_phone);
-CREATE INDEX idx_orders_created_at ON orders (created_at DESC);
+CREATE INDEX idx_orders_status ON foodstudio.orders (status);
+CREATE INDEX idx_orders_user_phone ON foodstudio.orders (user_phone);
+CREATE INDEX idx_orders_created_at ON foodstudio.orders (created_at DESC);
 
 -- =============================================
 -- USERS (extends Supabase Auth users)
 -- =============================================
-CREATE TABLE user_profiles (
+CREATE TABLE foodstudio.user_profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   phone TEXT UNIQUE,
   name TEXT DEFAULT '',
@@ -78,49 +82,62 @@ CREATE TABLE user_profiles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+
+-- =============================================
+-- ADMIN CREDENTIALS
+-- =============================================
+CREATE TABLE foodstudio.admin_credentials (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  username TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- =============================================
 -- ROW LEVEL SECURITY (RLS)
 -- =============================================
 
 -- Menu items: public read, admin write
-ALTER TABLE menu_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE foodstudio.menu_items ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Menu items are viewable by everyone"
-  ON menu_items FOR SELECT
+  ON foodstudio.menu_items FOR SELECT
   USING (true);
 
 CREATE POLICY "Menu items are editable by admins"
-  ON menu_items FOR ALL
+  ON foodstudio.menu_items FOR ALL
   USING (auth.jwt() ->> 'role' = 'admin');
 
 -- Orders: users see their own, admins see all
-ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE foodstudio.orders ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view their own orders"
-  ON orders FOR SELECT
+  ON foodstudio.orders FOR SELECT
   USING (user_phone = auth.jwt() ->> 'phone' OR auth.jwt() ->> 'role' = 'admin');
 
 CREATE POLICY "Users can create orders"
-  ON orders FOR INSERT
+  ON foodstudio.orders FOR INSERT
   WITH CHECK (true);
 
 CREATE POLICY "Admins can update orders"
-  ON orders FOR UPDATE
+  ON foodstudio.orders FOR UPDATE
   USING (auth.jwt() ->> 'role' = 'admin');
 
 -- User profiles: users manage their own
-ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE foodstudio.user_profiles ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view their own profile"
-  ON user_profiles FOR SELECT
+  ON foodstudio.user_profiles FOR SELECT
   USING (id = auth.uid());
 
 CREATE POLICY "Users can update their own profile"
-  ON user_profiles FOR UPDATE
+  ON foodstudio.user_profiles FOR UPDATE
   USING (id = auth.uid());
 
 CREATE POLICY "Users can insert their own profile"
-  ON user_profiles FOR INSERT
+  ON foodstudio.user_profiles FOR INSERT
   WITH CHECK (id = auth.uid());
 
 -- =============================================
@@ -135,13 +152,25 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_menu_items_updated_at
-  BEFORE UPDATE ON menu_items
+  BEFORE UPDATE ON foodstudio.menu_items
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_orders_updated_at
-  BEFORE UPDATE ON orders
+  BEFORE UPDATE ON foodstudio.orders
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_user_profiles_updated_at
-  BEFORE UPDATE ON user_profiles
+  BEFORE UPDATE ON foodstudio.user_profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_admin_credentials_updated_at
+  BEFORE UPDATE ON foodstudio.admin_credentials
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Grants for Supabase API roles
+GRANT USAGE ON SCHEMA foodstudio TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA foodstudio TO service_role;
+GRANT SELECT ON ALL TABLES IN SCHEMA foodstudio TO anon, authenticated;
+GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA foodstudio TO authenticated;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA foodstudio TO service_role;
+

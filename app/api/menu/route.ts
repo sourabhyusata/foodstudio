@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, createServerClient } from '@/lib/supabase';
-import { menuItems as fallbackItems } from '@/lib/menu-data';
 
-// GET /api/menu — Return all menu items from Supabase (with fallback)
+// GET /api/menu — Return all menu items from Supabase
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category');
@@ -26,29 +25,10 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error;
 
-    if (!data || data.length === 0) {
-      // Fallback to hardcoded data if DB is empty
-      let items = [...fallbackItems];
-      if (category && category !== 'All') {
-        items = items.filter((item) => item.category === category);
-      }
-      if (available === 'true') {
-        items = items.filter((item) => item.is_available);
-      }
-      return NextResponse.json({ items, total: items.length, source: 'fallback' });
-    }
-
-    return NextResponse.json({ items: data, total: data.length, source: 'database' });
-  } catch {
-    // Fallback to hardcoded data on any error
-    let items = [...fallbackItems];
-    if (category && category !== 'All') {
-      items = items.filter((item) => item.category === category);
-    }
-    if (available === 'true') {
-      items = items.filter((item) => item.is_available);
-    }
-    return NextResponse.json({ items, total: items.length, source: 'fallback' });
+    return NextResponse.json({ items: data || [], total: data?.length || 0, source: 'database' });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to fetch menu from database';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
