@@ -86,7 +86,7 @@ CREATE TABLE foodstudio.user_profiles (
 -- =============================================
 -- ADMIN CREDENTIALS
 -- =============================================
-CREATE TABLE foodstudio.admin_credentials (
+CREATE TABLE admin_credentials (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   username TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
@@ -167,10 +167,6 @@ CREATE TRIGGER update_admin_credentials_updated_at
   BEFORE UPDATE ON foodstudio.admin_credentials
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Grants for Supabase API roles
-GRANT USAGE ON SCHEMA foodstudio TO anon, authenticated, service_role;
-GRANT ALL ON ALL TABLES IN SCHEMA foodstudio TO service_role;
-GRANT SELECT ON ALL TABLES IN SCHEMA foodstudio TO anon, authenticated;
-GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA foodstudio TO authenticated;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA foodstudio TO service_role;
-
+CREATE TRIGGER update_admin_credentials_updated_at
+  BEFORE UPDATE ON admin_credentials
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
