@@ -71,7 +71,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 NEXT_PUBLIC_SUPABASE_DB_SCHEMA=foodstudio
 ADMIN_SESSION_SECRET=generate-a-long-random-secret
-DATABASE_URL=postgresql://postgres.<project-ref>:<password>@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
+DATABASE_URL=postgresql://postgres:DosaDarbar2026@db.qrnygdjdkipvwfoelrud.supabase.co:5432/postgres?sslmode=require
 
 # Razorpay
 NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
