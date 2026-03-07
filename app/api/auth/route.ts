@@ -14,19 +14,11 @@ export async function POST(request: NextRequest) {
     const supabase = createServerClient();
 
     if (action === 'send_otp') {
-      // Use Supabase Auth to send OTP via phone
       const { error } = await supabase.auth.signInWithOtp({
         phone: phone.startsWith('+') ? phone : `+91${phone}`,
       });
 
       if (error) {
-        // If Supabase phone auth isn't configured, use mock for dev
-        if (error.message.includes('not enabled') || error.message.includes('not supported')) {
-          return NextResponse.json({
-            message: 'OTP sent successfully (dev mode)',
-            dev_mode: true,
-          });
-        }
         throw error;
       }
 
@@ -45,21 +37,9 @@ export async function POST(request: NextRequest) {
       });
 
       if (error) {
-        // Dev mode fallback: accept any 6-digit OTP
-        if (error.message.includes('not enabled') || error.message.includes('not supported')) {
-          if (otp.length === 6) {
-            return NextResponse.json({
-              message: 'OTP verified (dev mode)',
-              user: { phone, name: name || '', verified: true },
-              dev_mode: true,
-            });
-          }
-          return NextResponse.json({ error: 'Invalid OTP' }, { status: 400 });
-        }
         throw error;
       }
 
-      // Create or update user profile
       if (data.user) {
         await supabase
           .from('user_profiles')

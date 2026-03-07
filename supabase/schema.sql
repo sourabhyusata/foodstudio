@@ -78,6 +78,19 @@ CREATE TABLE user_profiles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+
+-- =============================================
+-- ADMIN CREDENTIALS
+-- =============================================
+CREATE TABLE admin_credentials (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  username TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- =============================================
 -- ROW LEVEL SECURITY (RLS)
 -- =============================================
@@ -144,4 +157,8 @@ CREATE TRIGGER update_orders_updated_at
 
 CREATE TRIGGER update_user_profiles_updated_at
   BEFORE UPDATE ON user_profiles
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_admin_credentials_updated_at
+  BEFORE UPDATE ON admin_credentials
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
