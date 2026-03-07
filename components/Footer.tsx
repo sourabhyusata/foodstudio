@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { MapPin, Phone, Mail, Clock, Instagram } from 'lucide-react';
 
 export default function Footer() {
@@ -12,9 +13,13 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-saffron rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">D</span>
-              </div>
+              <Image
+                src="/images/logo.png"
+                alt="Dosa Darbar Logo"
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full object-cover"
+              />
               <span className="font-[family-name:var(--font-display)] text-2xl">
                 Dosa Darbar
               </span>
@@ -63,8 +68,8 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Phone size={16} className="text-saffron shrink-0" />
-                <a href="tel:+919876543210" className="hover:text-saffron-light">
-                  +91 98765 43210
+                <a href="tel:+919785132125" className="hover:text-saffron-light">
+                  +91 97851 32125
                 </a>
               </li>
               <li className="flex items-center gap-2">
@@ -106,7 +111,7 @@ export default function Footer() {
               </a>
             </div>
             <a
-              href="https://wa.me/919876543210?text=Hi%20Dosa%20Darbar!"
+              href="https://wa.me/919785132125?text=Hi%20Dosa%20Darbar!"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-leaf-green hover:bg-leaf-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"

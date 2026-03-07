@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, ClipboardList, UtensilsCrossed, LogOut, Menu, X } from 'lucide-react';
 
@@ -25,9 +26,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       >
         <div className="p-5 border-b border-white/10">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-saffron rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">D</span>
-            </div>
+            <Image
+              src="/images/logo.png"
+              alt="Dosa Darbar Logo"
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-full object-cover"
+            />
             <div>
               <div className="font-[family-name:var(--font-display)] text-lg">Admin Panel</div>
               <div className="text-xs text-gray-400">Dosa Darbar</div>
