@@ -4,7 +4,6 @@ import HeroSection from '@/components/HeroSection';
 import TestimonialCarousel from '@/components/TestimonialCarousel';
 import HomeBestsellers from './HomeBestsellers';
 import { supabase } from '@/lib/supabase';
-import { menuItems as fallbackItems } from '@/lib/menu-data';
 import { MenuItem } from '@/types';
 
 const highlights = [
@@ -31,22 +30,18 @@ const highlights = [
 ];
 
 async function getBestsellers(): Promise<MenuItem[]> {
-  try {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('*')
-      .eq('is_bestseller', true)
-      .eq('is_available', true)
-      .limit(6);
+  const { data, error } = await supabase
+    .from('menu_items')
+    .select('*')
+    .eq('is_bestseller', true)
+    .eq('is_available', true)
+    .limit(6);
 
-    if (error || !data || data.length === 0) {
-      return fallbackItems.filter((item) => item.is_bestseller).slice(0, 6);
-    }
-
-    return data;
-  } catch {
-    return fallbackItems.filter((item) => item.is_bestseller).slice(0, 6);
+  if (error) {
+    throw new Error(error.message);
   }
+
+  return data || [];
 }
 
 export default async function HomePage() {
