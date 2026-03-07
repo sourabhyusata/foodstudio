@@ -1,47 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase, createServerClient } from '@/lib/supabase';
+import { db } from '@/lib/db';
 
-// GET /api/menu — Return all menu items from Supabase
+// GET /api/menu — Return all menu items from SQLite
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category');
   const available = searchParams.get('available');
 
   try {
-    const dbClient = process.env.SUPABASE_SERVICE_ROLE_KEY ? createServerClient() : supabase;
+    const filters: { category?: string; available?: boolean } = {};
+    if (category && category !== 'All') filters.category = category;
+    if (available === 'true') filters.available = true;
 
-    let query = dbClient
-      .from('menu_items')
-      .select('*')
-      .order('created_at', { ascending: true });
+    const items = db.menuItems.getAll(filters);
 
-    if (category && category !== 'All') {
-      query = query.eq('category', category);
-    }
-
-    if (available === 'true') {
-      query = query.eq('is_available', true);
-    }
-
-    const { data, error } = await query;
-
-    if (error) throw error;
-
-    return NextResponse.json({ items: data || [], total: data?.length || 0, source: 'database' });
+    return NextResponse.json({ items, total: items.length, source: 'database' });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch menu from database';
-    const errorWithMetadata = err as { code?: string; hint?: string; details?: string };
-
-    return NextResponse.json(
-      {
-        error: message,
-        code: errorWithMetadata?.code,
-        hint: errorWithMetadata?.hint,
-        details: errorWithMetadata?.details,
-        source: 'database',
-      },
-      { status: 500 }
-    );
+    const message = err instanceof Error ? err.message : 'Failed to fetch menu';
+    return NextResponse.json({ error: message, source: 'database' }, { status: 500 });
   }
 }
 
@@ -49,18 +25,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const serverClient = createServerClient();
-
-    const { data, error } = await serverClient
-      .from('menu_items')
-      .insert(body)
-      .select()
-      .single();
-
-    if (error) throw error;
+    const item = db.menuItems.insert(body);
 
     return NextResponse.json(
-      { message: 'Menu item created', item: data },
+      { message: 'Menu item created', item },
       { status: 201 }
     );
   } catch (err) {
@@ -79,17 +47,9 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Item ID is required' }, { status: 400 });
     }
 
-    const serverClient = createServerClient();
-    const { data, error } = await serverClient
-      .from('menu_items')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+    const item = db.menuItems.update(id, updates);
 
-    if (error) throw error;
-
-    return NextResponse.json({ message: 'Menu item updated', item: data });
+    return NextResponse.json({ message: 'Menu item updated', item });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to update menu item';
     return NextResponse.json({ error: message }, { status: 400 });
@@ -106,13 +66,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Item ID is required' }, { status: 400 });
     }
 
-    const serverClient = createServerClient();
-    const { error } = await serverClient
-      .from('menu_items')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+    db.menuItems.delete(id);
 
     return NextResponse.json({ message: 'Menu item deleted' });
   } catch (err) {
