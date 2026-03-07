@@ -2,8 +2,10 @@ import Link from 'next/link';
 import { Utensils, Clock, IndianRupee, Flame } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
 import TestimonialCarousel from '@/components/TestimonialCarousel';
-import { menuItems } from '@/lib/menu-data';
 import HomeBestsellers from './HomeBestsellers';
+import { supabase } from '@/lib/supabase';
+import { menuItems as fallbackItems } from '@/lib/menu-data';
+import { MenuItem } from '@/types';
 
 const highlights = [
   {
@@ -13,8 +15,8 @@ const highlights = [
   },
   {
     icon: Utensils,
-    title: '30+ Dosa Varieties',
-    description: "From classic Masala Dosa to exotic Cheese Burst — there's a dosa for everyone.",
+    title: 'Made with Butter',
+    description: 'All our dosas and uttapams are made with butter for that rich, authentic taste.',
   },
   {
     icon: Clock,
@@ -28,9 +30,28 @@ const highlights = [
   },
 ];
 
-const bestsellers = menuItems.filter((item) => item.is_bestseller).slice(0, 6);
+async function getBestsellers(): Promise<MenuItem[]> {
+  try {
+    const { data, error } = await supabase
+      .from('menu_items')
+      .select('*')
+      .eq('is_bestseller', true)
+      .eq('is_available', true)
+      .limit(6);
 
-export default function HomePage() {
+    if (error || !data || data.length === 0) {
+      return fallbackItems.filter((item) => item.is_bestseller).slice(0, 6);
+    }
+
+    return data;
+  } catch {
+    return fallbackItems.filter((item) => item.is_bestseller).slice(0, 6);
+  }
+}
+
+export default async function HomePage() {
+  const bestsellers = await getBestsellers();
+
   return (
     <>
       <HeroSection />
@@ -140,14 +161,14 @@ export default function HomePage() {
             <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl text-brown-dark mb-3">
               Visit Us
             </h2>
-            <p className="text-gray-500">Find us on Ajmer Highway, Jaipur</p>
+            <p className="text-gray-500">Find us at Amrapali Nagar, Dhawas, Lalarpura, Jaipur</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Map */}
             <div className="rounded-2xl overflow-hidden shadow-md h-[350px] lg:h-auto">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.5!2d75.7!3d26.85!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sDosa%20Darbar%2C%20Ajmer%20Highway%2C%20Jaipur!5e0!3m2!1sen!2sin!4v1234567890"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.5!2d75.7!3d26.85!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sDosa%20Darbar%2C%20Amrapali%20Nagar%2C%20Jaipur!5e0!3m2!1sen!2sin!4v1234567890"
                 width="100%"
                 height="100%"
                 style={{ border: 0, minHeight: '350px' }}
@@ -178,14 +199,15 @@ export default function HomePage() {
                 Address
               </h3>
               <p className="text-gray-600 mb-6 leading-relaxed">
-                Dosa Darbar, Ajmer Highway,<br />
-                Jaipur, Rajasthan 302001,<br />
-                India
+                Shop No. G4, Amrapali Nagar,<br />
+                Dhawas, Lalarpura,<br />
+                Landmark: Meghraj Hospital,<br />
+                Gandhipath West, Jaipur
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
-                  href="https://maps.google.com/?q=Dosa+Darbar+Ajmer+Highway+Jaipur"
+                  href="https://maps.google.com/?q=Dosa+Darbar+Amrapali+Nagar+Jaipur"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 bg-saffron hover:bg-saffron-dark text-white text-center py-3 rounded-lg font-medium transition-colors"

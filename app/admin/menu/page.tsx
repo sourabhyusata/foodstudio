@@ -1,17 +1,19 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus, Pencil, Trash2, Search, X } from 'lucide-react';
-import { menuItems as initialMenuItems, categories } from '@/lib/menu-data';
+import { useState, useEffect } from 'react';
+import { Plus, Pencil, Trash2, Search, X, Loader2 } from 'lucide-react';
+import { categories as fallbackCategories } from '@/lib/menu-data';
 import { MenuItem, MenuCategory } from '@/types';
 import { formatPrice } from '@/lib/utils';
 
 export default function AdminMenuPage() {
-  const [items, setItems] = useState(initialMenuItems);
+  const [items, setItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<Partial<MenuItem>>({
     name: '',
     description: '',
@@ -22,6 +24,34 @@ export default function AdminMenuPage() {
     is_available: true,
     is_bestseller: false,
   });
+
+  // Derive categories from actual items
+  const categories = [...new Set(items.map((i) => i.category))].sort((a, b) => {
+    const order = [...fallbackCategories];
+    const ai = order.indexOf(a as typeof order[number]);
+    const bi = order.indexOf(b as typeof order[number]);
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+
+  // Fetch menu items from database
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  async function fetchItems() {
+    try {
+      const res = await fetch('/api/menu');
+      const data = await res.json();
+      if (data.items) setItems(data.items);
+    } catch {
+      // Items remain empty
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const filtered = items.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
@@ -50,33 +80,80 @@ export default function AdminMenuPage() {
     setShowForm(true);
   };
 
-  const handleSave = () => {
-    if (editingItem) {
-      setItems((prev) =>
-        prev.map((i) => (i.id === editingItem.id ? { ...i, ...formData } as MenuItem : i))
-      );
-    } else {
-      const newItem: MenuItem = {
-        ...formData,
-        id: `new-${Date.now()}`,
-        created_at: new Date().toISOString(),
-      } as MenuItem;
-      setItems((prev) => [...prev, newItem]);
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      if (editingItem) {
+        // Update existing item
+        const res = await fetch('/api/menu', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: editingItem.id, ...formData }),
+        });
+        const data = await res.json();
+        if (data.item) {
+          setItems((prev) => prev.map((i) => (i.id === editingItem.id ? data.item : i)));
+        }
+      } else {
+        // Create new item
+        const res = await fetch('/api/menu', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+        const data = await res.json();
+        if (data.item) {
+          setItems((prev) => [...prev, data.item]);
+        }
+      }
+      setShowForm(false);
+    } catch {
+      alert('Failed to save item. Please try again.');
+    } finally {
+      setSaving(false);
     }
-    setShowForm(false);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this item?')) {
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+
+    try {
+      await fetch(`/api/menu?id=${id}`, { method: 'DELETE' });
       setItems((prev) => prev.filter((i) => i.id !== id));
+    } catch {
+      alert('Failed to delete item.');
     }
   };
 
-  const toggleAvailability = (id: string) => {
-    setItems((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, is_available: !i.is_available } : i))
-    );
+  const toggleAvailability = async (id: string) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+
+    try {
+      const res = await fetch('/api/menu', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, is_available: !item.is_available }),
+      });
+      const data = await res.json();
+      if (data.item) {
+        setItems((prev) => prev.map((i) => (i.id === id ? data.item : i)));
+      }
+    } catch {
+      // Optimistic toggle on failure
+      setItems((prev) =>
+        prev.map((i) => (i.id === id ? { ...i, is_available: !i.is_available } : i))
+      );
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-saffron" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -246,7 +323,7 @@ export default function AdminMenuPage() {
                     onChange={(e) => setFormData({ ...formData, category: e.target.value as MenuCategory })}
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-saffron text-sm"
                   >
-                    {categories.map((cat) => (
+                    {[...fallbackCategories].map((cat) => (
                       <option key={cat} value={cat}>{cat}</option>
                     ))}
                   </select>
@@ -300,9 +377,10 @@ export default function AdminMenuPage() {
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 text-sm bg-saffron hover:bg-saffron-dark text-white rounded-lg font-medium transition-colors"
+                disabled={saving}
+                className="px-4 py-2 text-sm bg-saffron hover:bg-saffron-dark text-white rounded-lg font-medium transition-colors disabled:opacity-50"
               >
-                {editingItem ? 'Save Changes' : 'Add Item'}
+                {saving ? 'Saving...' : editingItem ? 'Save Changes' : 'Add Item'}
               </button>
             </div>
           </div>

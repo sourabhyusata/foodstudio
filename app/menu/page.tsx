@@ -1,16 +1,52 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { Search, SlidersHorizontal, Loader2 } from 'lucide-react';
 import MenuCard from '@/components/MenuCard';
-import { menuItems, categories } from '@/lib/menu-data';
+import { menuItems as fallbackMenuItems, categories as fallbackCategories } from '@/lib/menu-data';
+import { MenuItem } from '@/types';
 
 export default function MenuPage() {
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(fallbackMenuItems);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const [vegOnly, setVegOnly] = useState(false);
+
+  // Fetch menu items from Supabase via API
+  useEffect(() => {
+    async function fetchMenu() {
+      try {
+        const res = await fetch('/api/menu?available=true');
+        const data = await res.json();
+        if (data.items && data.items.length > 0) {
+          setMenuItems(data.items);
+        }
+      } catch {
+        // Fallback data is already set
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchMenu();
+  }, []);
+
+  // Derive categories from actual menu items
+  const categories = useMemo(() => {
+    const cats = [...new Set(menuItems.map((item) => item.category))];
+    // Sort by the fallback order if possible
+    const order = [...fallbackCategories];
+    return cats.sort((a, b) => {
+      const ai = order.indexOf(a as typeof order[number]);
+      const bi = order.indexOf(b as typeof order[number]);
+      if (ai === -1 && bi === -1) return a.localeCompare(b);
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
+    });
+  }, [menuItems]);
 
   const filteredItems = useMemo(() => {
     return menuItems.filter((item) => {
@@ -22,7 +58,7 @@ export default function MenuPage() {
       const matchesVeg = !vegOnly || item.is_veg;
       return matchesSearch && matchesCategory && matchesPrice && matchesVeg && item.is_available;
     });
-  }, [search, selectedCategory, priceRange, vegOnly]);
+  }, [menuItems, search, selectedCategory, priceRange, vegOnly]);
 
   const groupedItems = useMemo(() => {
     if (selectedCategory !== 'All') {
@@ -57,7 +93,7 @@ export default function MenuPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <input
               type="text"
-              placeholder="Search for dosas, idli, biryani..."
+              placeholder="Search for dosas, idli, uttapam..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-3 rounded-xl border border-cream-dark bg-white focus:outline-none focus:border-saffron focus:ring-2 focus:ring-saffron/20 transition-colors"
@@ -141,8 +177,13 @@ export default function MenuPage() {
           })}
         </div>
 
-        {/* Menu Items */}
-        {Object.keys(groupedItems).length === 0 ? (
+        {/* Loading State */}
+        {loading ? (
+          <div className="text-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-saffron mx-auto mb-4" />
+            <p className="text-gray-500">Loading menu...</p>
+          </div>
+        ) : Object.keys(groupedItems).length === 0 ? (
           <div className="text-center py-16">
             <div className="text-5xl mb-4">🔍</div>
             <h3 className="font-[family-name:var(--font-display)] text-xl text-brown-dark mb-2">
