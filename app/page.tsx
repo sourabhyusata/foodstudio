@@ -50,6 +50,8 @@ async function getBestsellers(): Promise<MenuItem[]> {
     console.error('Failed to fetch bestsellers:', error);
     return [];
   }
+
+  return data || [];
 }
 
 export default async function HomePage() {
