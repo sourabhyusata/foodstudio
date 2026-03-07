@@ -69,6 +69,7 @@ Create a `.env.local` file with the following variables:
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+NEXT_PUBLIC_SUPABASE_DB_SCHEMA=foodstudio
 
 # Razorpay
 NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
@@ -85,8 +86,9 @@ NEXT_PUBLIC_WHATSAPP_NUMBER=919876543210
 ### Database Setup
 
 1. Create a new Supabase project
-2. Run the schema migration in the Supabase SQL Editor: `supabase/schema.sql`
-3. Seed the menu data: `supabase/seed.sql`
+2. In **Supabase Dashboard → API Settings**, expose the `foodstudio` schema in exposed schemas.
+3. Run the schema migration in the Supabase SQL Editor: `supabase/schema.sql`
+4. Seed the menu/admin data: `supabase/seed.sql`
 
 ## Project Structure
 

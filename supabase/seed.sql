@@ -1,3 +1,7 @@
+-- Create and use dedicated application schema
+CREATE SCHEMA IF NOT EXISTS foodstudio;
+SET search_path TO foodstudio, public;
+
 -- =============================================
 -- Dosa Darbar — Menu Seed Data
 -- Run this in Supabase SQL Editor
@@ -7,7 +11,7 @@
 TRUNCATE TABLE menu_items CASCADE;
 TRUNCATE TABLE admin_credentials CASCADE;
 
-INSERT INTO menu_items (name, description, price, category, image_url, is_veg, is_available, is_bestseller, is_chefs_special) VALUES
+INSERT INTO foodstudio.menu_items (name, description, price, category, image_url, is_veg, is_available, is_bestseller, is_chefs_special) VALUES
 
 -- DOSA (from actual menu card)
 ('Plain Dosa', 'Crispy golden dosa served with sambar and coconut chutney. Made with butter.', 60, 'Dosa', 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400', true, true, false, false),
