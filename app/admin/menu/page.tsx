@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, Search, X, Loader2 } from 'lucide-react';
-import { categories as fallbackCategories } from '@/lib/menu-data';
 import { MenuItem, MenuCategory } from '@/types';
 import { formatPrice } from '@/lib/utils';
 
@@ -27,7 +26,7 @@ export default function AdminMenuPage() {
 
   // Derive categories from actual items
   const categories = [...new Set(items.map((i) => i.category))].sort((a, b) => {
-    const order = [...fallbackCategories];
+    const order = ['Dosa', 'South Indian', 'Uttapam'];
     const ai = order.indexOf(a as typeof order[number]);
     const bi = order.indexOf(b as typeof order[number]);
     if (ai === -1 && bi === -1) return a.localeCompare(b);
@@ -323,7 +322,7 @@ export default function AdminMenuPage() {
                     onChange={(e) => setFormData({ ...formData, category: e.target.value as MenuCategory })}
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-saffron text-sm"
                   >
-                    {[...fallbackCategories].map((cat) => (
+                    {['Dosa', 'South Indian', 'Uttapam'].map((cat) => (
                       <option key={cat} value={cat}>{cat}</option>
                     ))}
                   </select>
