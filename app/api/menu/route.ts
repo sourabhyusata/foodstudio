@@ -1,73 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase, createServerClient } from '@/lib/supabase';
-import { menuItems as fallbackItems } from '@/lib/menu-data';
+import { menuItems as seedMenuItems } from '@/lib/menu-data';
+import { MenuItem } from '@/types';
 
-// GET /api/menu — Return all menu items from Supabase (with fallback)
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
+let inMemoryMenuItems: MenuItem[] = seedMenuItems.map((item) => ({ ...item }));
+
+function getFilteredItems(searchParams: URLSearchParams) {
   const category = searchParams.get('category');
   const available = searchParams.get('available');
 
-  try {
-    let query = supabase
-      .from('menu_items')
-      .select('*')
-      .order('created_at', { ascending: true });
+  let items = [...inMemoryMenuItems];
 
-    if (category && category !== 'All') {
-      query = query.eq('category', category);
-    }
-
-    if (available === 'true') {
-      query = query.eq('is_available', true);
-    }
-
-    const { data, error } = await query;
-
-    if (error) throw error;
-
-    if (!data || data.length === 0) {
-      // Fallback to hardcoded data if DB is empty
-      let items = [...fallbackItems];
-      if (category && category !== 'All') {
-        items = items.filter((item) => item.category === category);
-      }
-      if (available === 'true') {
-        items = items.filter((item) => item.is_available);
-      }
-      return NextResponse.json({ items, total: items.length, source: 'fallback' });
-    }
-
-    return NextResponse.json({ items: data, total: data.length, source: 'database' });
-  } catch {
-    // Fallback to hardcoded data on any error
-    let items = [...fallbackItems];
-    if (category && category !== 'All') {
-      items = items.filter((item) => item.category === category);
-    }
-    if (available === 'true') {
-      items = items.filter((item) => item.is_available);
-    }
-    return NextResponse.json({ items, total: items.length, source: 'fallback' });
+  if (category && category !== 'All') {
+    items = items.filter((item) => item.category === category);
   }
+
+  if (available === 'true') {
+    items = items.filter((item) => item.is_available);
+  }
+
+  return items;
 }
 
-// POST /api/menu — Add a new menu item (admin only)
+// GET /api/menu — Return menu items from local config
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const items = getFilteredItems(searchParams);
+
+  return NextResponse.json({ items, total: items.length, source: 'config' });
+}
+
+// POST /api/menu — Add a new menu item
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const serverClient = createServerClient();
+    const item: MenuItem = {
+      id: body.id || `item-${Date.now()}`,
+      name: body.name || '',
+      description: body.description || '',
+      price: Number(body.price || 0),
+      category: body.category || 'Dosa',
+      image_url: body.image_url || '',
+      is_veg: body.is_veg ?? true,
+      is_available: body.is_available ?? true,
+      is_bestseller: body.is_bestseller ?? false,
+      is_chefs_special: body.is_chefs_special ?? false,
+      created_at: body.created_at,
+    };
 
-    const { data, error } = await serverClient
-      .from('menu_items')
-      .insert(body)
-      .select()
-      .single();
-
-    if (error) throw error;
+    inMemoryMenuItems = [...inMemoryMenuItems, item];
 
     return NextResponse.json(
-      { message: 'Menu item created', item: data },
+      { message: 'Menu item created', item, source: 'config' },
       { status: 201 }
     );
   } catch (err) {
@@ -76,7 +59,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT /api/menu — Update a menu item (admin only)
+// PUT /api/menu — Update a menu item
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
@@ -86,24 +69,27 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Item ID is required' }, { status: 400 });
     }
 
-    const serverClient = createServerClient();
-    const { data, error } = await serverClient
-      .from('menu_items')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+    let updatedItem: MenuItem | null = null;
 
-    if (error) throw error;
+    inMemoryMenuItems = inMemoryMenuItems.map((item) => {
+      if (item.id !== id) return item;
+      const mergedItem: MenuItem = { ...item, ...updates };
+      updatedItem = mergedItem;
+      return mergedItem;
+    });
 
-    return NextResponse.json({ message: 'Menu item updated', item: data });
+    if (!updatedItem) {
+      return NextResponse.json({ error: 'Item not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: 'Menu item updated', item: updatedItem, source: 'config' });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to update menu item';
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }
 
-// DELETE /api/menu — Delete a menu item (admin only)
+// DELETE /api/menu — Delete a menu item
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -113,15 +99,14 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Item ID is required' }, { status: 400 });
     }
 
-    const serverClient = createServerClient();
-    const { error } = await serverClient
-      .from('menu_items')
-      .delete()
-      .eq('id', id);
+    const before = inMemoryMenuItems.length;
+    inMemoryMenuItems = inMemoryMenuItems.filter((item) => item.id !== id);
 
-    if (error) throw error;
+    if (inMemoryMenuItems.length === before) {
+      return NextResponse.json({ error: 'Item not found' }, { status: 404 });
+    }
 
-    return NextResponse.json({ message: 'Menu item deleted' });
+    return NextResponse.json({ message: 'Menu item deleted', source: 'config' });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to delete menu item';
     return NextResponse.json({ error: message }, { status: 400 });

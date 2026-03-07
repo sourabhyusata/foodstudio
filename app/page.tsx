@@ -1,10 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { Utensils, Clock, IndianRupee, Flame } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
 import TestimonialCarousel from '@/components/TestimonialCarousel';
 import HomeBestsellers from './HomeBestsellers';
-import { supabase } from '@/lib/supabase';
-import { menuItems as fallbackItems } from '@/lib/menu-data';
+import { menuItems } from '@/lib/menu-data';
 import { MenuItem } from '@/types';
 
 const highlights = [
@@ -30,27 +31,14 @@ const highlights = [
   },
 ];
 
-async function getBestsellers(): Promise<MenuItem[]> {
-  try {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('*')
-      .eq('is_bestseller', true)
-      .eq('is_available', true)
-      .limit(6);
-
-    if (error || !data || data.length === 0) {
-      return fallbackItems.filter((item) => item.is_bestseller).slice(0, 6);
-    }
-
-    return data;
-  } catch {
-    return fallbackItems.filter((item) => item.is_bestseller).slice(0, 6);
-  }
+function getBestsellers(): MenuItem[] {
+  return menuItems
+    .filter((item) => item.is_bestseller && item.is_available)
+    .slice(0, 6);
 }
 
-export default async function HomePage() {
-  const bestsellers = await getBestsellers();
+export default function HomePage() {
+  const bestsellers = getBestsellers();
 
   return (
     <>
