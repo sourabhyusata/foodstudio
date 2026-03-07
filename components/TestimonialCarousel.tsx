@@ -1,11 +1,47 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
-import { testimonials } from '@/lib/menu-data';
+import { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, Star, Loader2 } from 'lucide-react';
+import { Testimonial } from '@/types';
 
-export default function TestimonialCarousel() {
+interface TestimonialCarouselProps {
+  initialTestimonials?: Testimonial[];
+}
+
+export default function TestimonialCarousel({ initialTestimonials }: TestimonialCarouselProps) {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials || []);
+  const [loading, setLoading] = useState(!initialTestimonials);
   const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (initialTestimonials) return;
+
+    async function fetchTestimonials() {
+      try {
+        const res = await fetch('/api/testimonials');
+        if (res.ok) {
+          const data = await res.json();
+          setTestimonials(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch testimonials:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchTestimonials();
+  }, [initialTestimonials]);
+
+  if (loading) {
+    return (
+      <section className="py-16 sm:py-20 bg-brown-dark flex items-center justify-center">
+        <Loader2 className="animate-spin text-white" />
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) return null;
 
   const next = () => setCurrent((prev) => (prev + 1) % testimonials.length);
   const prev = () =>

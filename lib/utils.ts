@@ -8,9 +8,9 @@ export function formatPrice(price: number): string {
   return `₹${price.toLocaleString('en-IN')}`;
 }
 
-// Calculate GST (5% for restaurants)
-export function calculateGST(subtotal: number): number {
-  return Math.round(subtotal * 0.05);
+// Calculate GST (rate comes from DB site_settings)
+export function calculateGST(subtotal: number, taxRate: number = 0.05): number {
+  return Math.round(subtotal * taxRate);
 }
 
 // Calculate delivery charge based on distance
@@ -40,10 +40,9 @@ export function formatDate(dateString: string): string {
   });
 }
 
-// WhatsApp order link
-export function generateWhatsAppLink(items: { name: string; quantity: number; price: number }[], total: number): string {
-  const phone = '919XXXXXXXXXX'; // Replace with actual number
-  let message = '🍽️ *New Order from Dosa Darbar Website*\n\n';
+// WhatsApp order link (phone number comes from DB site_settings)
+export function generateWhatsAppLink(items: { name: string; quantity: number; price: number }[], total: number, phone: string): string {
+  let message = '*New Order from Dosa Darbar Website*\n\n';
   items.forEach((item) => {
     message += `• ${item.name} x${item.quantity} — ₹${item.price * item.quantity}\n`;
   });

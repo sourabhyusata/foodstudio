@@ -2,10 +2,18 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { CartItem, MenuItem } from '@/types';
 
+interface CartConfig {
+  taxRate: number;
+  deliveryChargeDefault: number;
+  freeDeliveryThreshold: number;
+}
+
 interface CartState {
   items: CartItem[];
   isOpen: boolean;
   orderType: 'delivery' | 'takeaway';
+  config: CartConfig;
+  configLoaded: boolean;
 
   // Actions
   addItem: (item: MenuItem) => void;
@@ -16,6 +24,7 @@ interface CartState {
   toggleCart: () => void;
   setCartOpen: (open: boolean) => void;
   setOrderType: (type: 'delivery' | 'takeaway') => void;
+  loadConfig: () => Promise<void>;
 
   // Computed
   getSubtotal: () => number;
@@ -31,8 +40,35 @@ export const useCartStore = create<CartState>()(
       items: [],
       isOpen: false,
       orderType: 'delivery',
+      config: {
+        taxRate: 0.05,
+        deliveryChargeDefault: 30,
+        freeDeliveryThreshold: 500,
+      },
+      configLoaded: false,
+
+      loadConfig: async () => {
+        if (get().configLoaded) return;
+        try {
+          const res = await fetch('/api/site-settings');
+          if (res.ok) {
+            const settings = await res.json();
+            set({
+              config: {
+                taxRate: parseFloat(settings.tax_rate) || 0.05,
+                deliveryChargeDefault: parseFloat(settings.delivery_charge_default) || 30,
+                freeDeliveryThreshold: parseFloat(settings.free_delivery_threshold) || 500,
+              },
+              configLoaded: true,
+            });
+          }
+        } catch (err) {
+          console.error('Failed to load cart config:', err);
+        }
+      },
 
       addItem: (item: MenuItem) => {
+        get().loadConfig();
         set((state) => {
           const existing = state.items.find((i) => i.item.id === item.id);
           if (existing) {
@@ -89,14 +125,16 @@ export const useCartStore = create<CartState>()(
       },
 
       getTax: () => {
-        return Math.round(get().getSubtotal() * 0.05);
+        const { config } = get();
+        return Math.round(get().getSubtotal() * config.taxRate);
       },
 
       getDeliveryCharge: () => {
+        const { config } = get();
         if (get().orderType === 'takeaway') return 0;
         const subtotal = get().getSubtotal();
-        if (subtotal >= 500) return 0; // Free delivery above ₹500
-        return 30;
+        if (subtotal >= config.freeDeliveryThreshold) return 0;
+        return config.deliveryChargeDefault;
       },
 
       getTotal: () => {
