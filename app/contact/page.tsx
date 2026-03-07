@@ -92,7 +92,7 @@ export default function ContactPage() {
                           required
                           value={form.phone}
                           onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                          placeholder="+91 98765 43210"
+                          placeholder="+91 97851 32125"
                           className="w-full px-4 py-3 border border-cream-dark rounded-lg focus:outline-none focus:border-saffron focus:ring-2 focus:ring-saffron/20"
                         />
                       </div>
@@ -147,8 +147,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h4 className="font-medium text-brown-dark">Phone</h4>
-                      <a href="tel:+919876543210" className="text-gray-500 text-sm hover:text-saffron mt-0.5 block">
-                        +91 98765 43210
+                      <a href="tel:+919785132125" className="text-gray-500 text-sm hover:text-saffron mt-0.5 block">
+                        +91 97851 32125
                       </a>
                     </div>
                   </li>
@@ -180,7 +180,7 @@ export default function ContactPage() {
               {/* Quick Actions */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <a
-                  href="https://wa.me/919876543210?text=Hi%20Dosa%20Darbar!"
+                  href="https://wa.me/919785132125?text=Hi%20Dosa%20Darbar!"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 bg-leaf-green text-white p-4 rounded-xl hover:bg-leaf-dark transition-colors"

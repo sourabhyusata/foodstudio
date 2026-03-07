@@ -93,6 +93,43 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Dosa Preparation Video */}
+      <section className="py-16 sm:py-20 bg-brown-dark relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <div
+            className="w-full h-full"
+            style={{
+              backgroundImage: `radial-gradient(circle, #fff 1px, transparent 1px)`,
+              backgroundSize: '24px 24px',
+            }}
+          />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-10">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl text-white mb-3">
+              The Art of Dosa Making
+            </h2>
+            <p className="text-gray-400 max-w-xl mx-auto">
+              Watch our skilled chefs craft the perfect crispy dosa — from fresh batter to your plate
+            </p>
+          </div>
+          <div className="max-w-4xl mx-auto">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-video">
+              <iframe
+                src="https://www.youtube.com/embed/ei4cLt0mRKA?rel=0&modestbranding=1"
+                title="Dosa Preparation at Dosa Darbar"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+              />
+            </div>
+            <p className="text-center text-gray-500 text-sm mt-4">
+              Fresh batter, hot griddle, perfect crisp — every single time
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials */}
       <TestimonialCarousel />
 
@@ -156,7 +193,7 @@ export default function HomePage() {
                   Get Directions
                 </a>
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+919785132125"
                   className="flex-1 bg-white border-2 border-saffron text-saffron hover:bg-saffron hover:text-white text-center py-3 rounded-lg font-medium transition-colors"
                 >
                   Call Us
@@ -184,7 +221,7 @@ export default function HomePage() {
               Order Online
             </Link>
             <a
-              href="https://wa.me/919876543210?text=Hi!%20I%20would%20like%20to%20place%20an%20order"
+              href="https://wa.me/919785132125?text=Hi!%20I%20would%20like%20to%20place%20an%20order"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white/10 hover:bg-white/20 text-white border border-white/30 px-8 py-4 rounded-xl font-semibold text-lg transition-colors backdrop-blur-sm"

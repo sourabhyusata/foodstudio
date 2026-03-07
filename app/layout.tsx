@@ -72,7 +72,7 @@ export default function RootLayout({
               servesCuisine: ["South Indian", "North Indian", "Chinese"],
               priceRange: "₹₹",
               openingHours: "Mo-Su 08:00-23:00",
-              telephone: "+91-9876543210",
+              telephone: "+91-9785132125",
               url: "https://dosadarbar.in",
               menu: "https://dosadarbar.in/menu",
             }),

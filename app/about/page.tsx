@@ -7,12 +7,12 @@ export const metadata: Metadata = {
 };
 
 const gallery = [
-  { src: 'https://images.unsplash.com/photo-1630383249896-424e482df921?w=600', alt: 'Masala Dosa being served' },
+  { src: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=600', alt: 'Uttapam served with coconut chutney and sambar' },
+  { src: 'https://images.unsplash.com/photo-1630383249896-424e482df921?w=600', alt: 'Crispy golden masala dosa on banana leaf' },
+  { src: 'https://images.unsplash.com/photo-1625398407796-82650a8c135f?w=600', alt: 'Cheese burst dosa with fresh toppings' },
+  { src: 'https://images.unsplash.com/photo-1567337710282-00832b415979?w=600', alt: 'Classic masala dosa with green and red chutney' },
   { src: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600', alt: 'South Indian thali spread' },
-  { src: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=600', alt: 'Fresh ingredients preparation' },
-  { src: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600', alt: 'Restaurant kitchen in action' },
-  { src: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=600', alt: 'Paneer curry closeup' },
-  { src: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600', alt: 'Biryani being plated' },
+  { src: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600', alt: 'Fresh South Indian cuisine' },
 ];
 
 export default function AboutPage() {

@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, ShoppingCart, Phone } from 'lucide-react';
+import Image from 'next/image';
+import { Menu, X, ShoppingCart, Phone, Lock } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 
 const navLinks = [
@@ -24,15 +25,20 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-saffron rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg md:text-xl">D</span>
-            </div>
+            <Image
+              src="/images/logo.png"
+              alt="Dosa Darbar Logo"
+              width={48}
+              height={48}
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
+              priority
+            />
             <div className="flex flex-col">
               <span className="font-[family-name:var(--font-display)] text-xl md:text-2xl text-brown-dark leading-tight">
                 Dosa Darbar
               </span>
               <span className="text-[10px] md:text-xs text-brown-light tracking-wider uppercase">
-                South Indian Restaurant
+                Where Every Dosa Rules
               </span>
             </div>
           </Link>
@@ -53,11 +59,11 @@ export default function Navbar() {
           {/* Right Actions */}
           <div className="flex items-center gap-3">
             <a
-              href="tel:+919876543210"
+              href="tel:+919785132125"
               className="hidden sm:flex items-center gap-1 text-sm text-brown hover:text-saffron transition-colors"
             >
               <Phone size={16} />
-              <span className="hidden lg:inline">+91 98765 43210</span>
+              <span className="hidden lg:inline">+91 97851 32125</span>
             </a>
 
             <button
@@ -72,6 +78,15 @@ export default function Navbar() {
                 </span>
               )}
             </button>
+
+            {/* Admin Login Button */}
+            <Link
+              href="/admin"
+              className="hidden sm:flex items-center gap-1.5 text-sm bg-brown-dark hover:bg-brown text-white px-3 py-1.5 rounded-lg transition-colors"
+            >
+              <Lock size={14} />
+              <span className="hidden lg:inline">Admin</span>
+            </Link>
 
             {/* Mobile menu button */}
             <button
@@ -100,12 +115,20 @@ export default function Navbar() {
               </Link>
             ))}
             <a
-              href="tel:+919876543210"
+              href="tel:+919785132125"
               className="flex items-center gap-2 px-3 py-2.5 text-saffron font-medium"
             >
               <Phone size={16} />
-              +91 98765 43210
+              +91 97851 32125
             </a>
+            <Link
+              href="/admin"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2 px-3 py-2.5 text-brown-dark hover:bg-cream rounded-lg transition-colors font-medium"
+            >
+              <Lock size={16} />
+              Admin Login
+            </Link>
           </div>
         </div>
       )}
