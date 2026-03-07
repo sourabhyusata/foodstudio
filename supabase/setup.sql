@@ -131,6 +131,10 @@ DROP POLICY IF EXISTS "Users can insert own profile" ON foodstudio.user_profiles
 CREATE POLICY "Users can insert own profile"
   ON foodstudio.user_profiles FOR INSERT WITH CHECK (id = auth.uid());
 
+
+-- Admin credentials: service role only (no anon/auth policies)
+ALTER TABLE foodstudio.admin_credentials ENABLE ROW LEVEL SECURITY;
+
 -- =============================================
 -- UPDATED_AT TRIGGER
 -- =============================================
@@ -198,6 +202,13 @@ INSERT INTO foodstudio.menu_items (name, description, price, category, image_url
 -- Grants for Supabase API roles
 GRANT USAGE ON SCHEMA foodstudio TO anon, authenticated, service_role;
 GRANT ALL ON ALL TABLES IN SCHEMA foodstudio TO service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA foodstudio TO service_role;
+
+-- Public app access (excluding admin_credentials)
+GRANT SELECT ON foodstudio.menu_items TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE ON foodstudio.orders TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON foodstudio.user_profiles TO authenticated;
+
 GRANT SELECT ON ALL TABLES IN SCHEMA foodstudio TO anon, authenticated;
 GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA foodstudio TO authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA foodstudio TO service_role;
