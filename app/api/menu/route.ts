@@ -8,7 +8,9 @@ export async function GET(request: NextRequest) {
   const available = searchParams.get('available');
 
   try {
-    let query = supabase
+    const dbClient = process.env.SUPABASE_SERVICE_ROLE_KEY ? createServerClient() : supabase;
+
+    let query = dbClient
       .from('menu_items')
       .select('*')
       .order('created_at', { ascending: true });
@@ -28,7 +30,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ items: data || [], total: data?.length || 0, source: 'database' });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to fetch menu from database';
-    return NextResponse.json({ error: message }, { status: 500 });
+    const errorWithMetadata = err as { code?: string; hint?: string; details?: string };
+
+    return NextResponse.json(
+      {
+        error: message,
+        code: errorWithMetadata?.code,
+        hint: errorWithMetadata?.hint,
+        details: errorWithMetadata?.details,
+        source: 'database',
+      },
+      { status: 500 }
+    );
   }
 }
 
