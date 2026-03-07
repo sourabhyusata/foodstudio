@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminSessionToken } from '@/lib/admin-session';
 
 export async function middleware(request: NextRequest) {
+
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!pathname.startsWith('/admin')) {
@@ -13,6 +15,7 @@ export async function middleware(request: NextRequest) {
   const hasSession = Boolean(
     sessionSecret && adminSession && await verifyAdminSessionToken(adminSession, sessionSecret)
   );
+  const hasSession = Boolean(request.cookies.get('admin_session')?.value);
 
   if (pathname === '/admin/login') {
     if (hasSession) {

@@ -209,6 +209,10 @@ GRANT SELECT ON foodstudio.menu_items TO anon, authenticated;
 GRANT SELECT, INSERT, UPDATE ON foodstudio.orders TO authenticated;
 GRANT SELECT, INSERT, UPDATE ON foodstudio.user_profiles TO authenticated;
 
+GRANT SELECT ON ALL TABLES IN SCHEMA foodstudio TO anon, authenticated;
+GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA foodstudio TO authenticated;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA foodstudio TO service_role;
+
 
 
 INSERT INTO foodstudio.admin_credentials (username, password_hash, is_active) VALUES
