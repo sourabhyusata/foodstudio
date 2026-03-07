@@ -14,7 +14,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Image
-                src="/images/logo.png"
+                src="/images/logo.svg"
                 alt="Dosa Darbar Logo"
                 width={40}
                 height={40}
@@ -108,6 +108,15 @@ export default function Footer() {
                 aria-label="Zomato"
               >
                 <span className="font-bold text-sm">Z</span>
+              </a>
+              <a
+                href="https://www.swiggy.com/city/jaipur/dosa-darbar-vaishali-nagar-rest1103230?utm_source=GooglePlaceOrder&utm_campaign=GoogleMap&is_retargeting=true&media_source=GooglePlaceOrder"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-saffron transition-colors"
+                aria-label="Swiggy"
+              >
+                <span className="font-bold text-sm">S</span>
               </a>
             </div>
             <a
