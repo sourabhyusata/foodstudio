@@ -1,5 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+
+interface OrderRecord {
+  id: string;
+  order_number: string;
+  user_phone: string;
+  customer_name: string;
+  items: { name: string; quantity: number; price: number }[];
+  subtotal: number;
+  tax: number;
+  delivery_charge: number;
+  total: number;
+  order_type: string;
+  delivery_address: Record<string, unknown> | null;
+  status: string;
+  payment_method: string;
+  payment_status: string;
+  created_at: string;
+}
+
+// In-memory orders store (resets on server restart — suitable for demo/static site)
+let inMemoryOrders: OrderRecord[] = [];
 
 // POST /api/orders — Create a new order
 export async function POST(request: NextRequest) {
@@ -28,7 +48,8 @@ export async function POST(request: NextRequest) {
 
     const order_number = `DD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
-    const order = db.orders.insert({
+    const order: OrderRecord = {
+      id: crypto.randomUUID(),
       order_number,
       user_phone,
       customer_name: customer_name || '',
@@ -42,7 +63,10 @@ export async function POST(request: NextRequest) {
       status: 'received',
       payment_method,
       payment_status: 'pending',
-    });
+      created_at: new Date().toISOString(),
+    };
+
+    inMemoryOrders = [order, ...inMemoryOrders];
 
     return NextResponse.json(
       { message: 'Order created', order },
@@ -63,16 +87,14 @@ export async function GET(request: NextRequest) {
   const phone = searchParams.get('phone');
   const status = searchParams.get('status');
 
-  try {
-    const filters: { phone?: string; status?: string } = {};
-    if (phone) filters.phone = phone;
-    if (status) filters.status = status;
+  let orders = [...inMemoryOrders];
 
-    const orders = db.orders.getAll(filters);
-
-    return NextResponse.json({ orders });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch orders';
-    return NextResponse.json({ error: message }, { status: 500 });
+  if (phone) {
+    orders = orders.filter((o) => o.user_phone === phone);
   }
+  if (status) {
+    orders = orders.filter((o) => o.status === status);
+  }
+
+  return NextResponse.json({ orders });
 }

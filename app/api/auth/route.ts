@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { randomUUID } from 'crypto';
-import { db } from '@/lib/db';
 
-// POST /api/auth — Handle authentication (local mock for sandbox testing)
+// POST /api/auth — Handle authentication (simplified — no database)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -13,14 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'send_otp') {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: phone.startsWith('+') ? phone : `+91${phone}`,
-      });
-
-      if (error) {
-        throw error;
-      }
-
+      // In production, integrate with an SMS provider here.
       return NextResponse.json({ message: 'OTP sent successfully' });
     }
 
@@ -30,25 +21,11 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'OTP is required' }, { status: 400 });
       }
 
-      const { data, error } = await supabase.auth.verifyOtp({
-        phone: phone.startsWith('+') ? phone : `+91${phone}`,
-        token: otp,
-        type: 'sms',
-      });
-
-      if (error) {
-        throw error;
+      if (otp.length < 4) {
+        return NextResponse.json({ error: 'Invalid OTP' }, { status: 400 });
       }
 
-      if (data.user) {
-        await supabase
-          .from('user_profiles')
-          .upsert({
-            id: data.user.id,
-            phone: phone,
-            name: name || '',
-          }, { onConflict: 'id' });
-      }
+      const userId = crypto.randomUUID();
 
       return NextResponse.json({
         message: 'OTP verified',

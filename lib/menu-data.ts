@@ -1,9 +1,22 @@
-import { MenuItem } from '@/types';
+import { MenuItem, Testimonial } from '@/types';
+
+// =============================================
+// Dosa Darbar — Site Data Configuration
+// Edit this file to update menu items, testimonials,
+// admin credentials, and other site content.
+// =============================================
 
 export const siteData = {
+  // ------------------------------------------
+  // MENU ITEMS
+  // Add/remove/edit items here.
+  // Categories: 'Dosa' | 'South Indian' | 'Uttapam'
+  // (add more categories in types/index.ts if needed)
+  // ------------------------------------------
   menu: {
     categoryOrder: ['Dosa', 'South Indian', 'Uttapam'] as const,
     items: [
+      // --- DOSA ---
       { id: 'd001', name: 'Plain Dosa', description: 'Crispy golden dosa served with sambar and coconut chutney. Made with butter.', price: 60, category: 'Dosa', image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400', is_veg: true, is_available: true, is_bestseller: false },
       { id: 'd002', name: 'Plain Podi Masala Dosa', description: 'Crispy dosa with spicy podi masala — a South Indian classic', price: 70, category: 'Dosa', image_url: 'https://images.unsplash.com/photo-1630383249896-424e482df921?w=400', is_veg: true, is_available: true, is_bestseller: false },
       { id: 'd003', name: 'Plain Onion Dosa', description: 'Crispy dosa topped with golden caramelized onions', price: 70, category: 'Dosa', image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400', is_veg: true, is_available: true, is_bestseller: false },
@@ -16,14 +29,23 @@ export const siteData = {
       { id: 'd010', name: 'Cheese Masala Dosa', description: 'Masala dosa loaded with melted cheese', price: 120, category: 'Dosa', image_url: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=400', is_veg: true, is_available: true, is_bestseller: true },
       { id: 'd011', name: 'Schezwan Masala Dosa', description: 'Indo-Chinese twist with spicy schezwan sauce and masala', price: 120, category: 'Dosa', image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400', is_veg: true, is_available: true, is_bestseller: false },
       { id: 'd012', name: 'Schezwan Cheese Masala Dosa', description: 'Schezwan masala dosa with extra cheese — our premium dosa', price: 140, category: 'Dosa', image_url: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=400', is_veg: true, is_available: true, is_bestseller: false, is_chefs_special: true },
+
+      // --- SOUTH INDIAN ---
       { id: 'si001', name: 'Idli Sambhar (2 Pcs)', description: 'Steamed rice cakes served with hot sambar and coconut chutney', price: 50, category: 'South Indian', image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400', is_veg: true, is_available: true, is_bestseller: false },
       { id: 'si002', name: 'Masala Idli', description: 'Idlis tossed with spicy masala and served with chutney', price: 70, category: 'South Indian', image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400', is_veg: true, is_available: true, is_bestseller: false },
+
+      // --- UTTAPAM ---
       { id: 'u001', name: 'Onion Uttapam', description: 'Soft uttapam topped with chopped onions. Made with butter.', price: 90, category: 'Uttapam', image_url: 'https://images.unsplash.com/photo-1630383249896-424e482df921?w=400', is_veg: true, is_available: true, is_bestseller: false },
       { id: 'u002', name: 'Vegetable Uttapam', description: 'Loaded with onions, tomatoes, capsicum and carrots. Made with butter.', price: 100, category: 'Uttapam', image_url: 'https://images.unsplash.com/photo-1630383249896-424e482df921?w=400', is_veg: true, is_available: true, is_bestseller: false },
       { id: 'u003', name: 'Paneer Uttapam', description: 'Soft uttapam with crumbled paneer topping. Made with butter.', price: 120, category: 'Uttapam', image_url: 'https://images.unsplash.com/photo-1630383249896-424e482df921?w=400', is_veg: true, is_available: true, is_bestseller: false },
       { id: 'u004', name: 'Cheese Uttapam', description: 'Uttapam topped with generous melted cheese. Made with butter.', price: 130, category: 'Uttapam', image_url: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=400', is_veg: true, is_available: true, is_bestseller: false },
     ] as MenuItem[],
   },
+
+  // ------------------------------------------
+  // TESTIMONIALS
+  // Add/edit customer reviews here.
+  // ------------------------------------------
   testimonials: [
     { id: '1', name: 'Rahul Sharma', rating: 5, comment: 'Best dosas in Jaipur, hands down! The Mysore Masala Dosa is absolutely incredible. Fresh batter, perfect crispiness, and the chutney is to die for.', date: '2025-12-15', avatar: '' },
     { id: '2', name: 'Priya Gupta', rating: 5, comment: 'We come here every weekend as a family. The Cheese Masala Dosa is a must-try — loaded with cheese and so flavorful! Great value for money.', date: '2026-01-08', avatar: '' },
@@ -31,7 +53,17 @@ export const siteData = {
     { id: '4', name: 'Sneha Patel', rating: 5, comment: 'The Schezwan Cheese Masala Dosa is a game changer! Crispy outside, oozing cheese inside. My kids absolutely love this place.', date: '2026-01-25', avatar: '' },
     { id: '5', name: 'Vikram Singh', rating: 5, comment: 'Dosa Darbar is my go-to place near Amrapali Nagar. Quick service, fresh food, and affordable prices. Can\'t beat that combo!', date: '2026-03-01', avatar: '' },
     { id: '6', name: 'Ananya Reddy', rating: 4, comment: 'Being from Hyderabad, I\'m very particular about South Indian food. Dosa Darbar doesn\'t disappoint — all dosas made with butter, just perfect!', date: '2026-02-10', avatar: '' },
-  ],
+  ] as Testimonial[],
+
+  // ------------------------------------------
+  // ADMIN CREDENTIALS
+  // Password: admin123
+  // To change, generate a new hash using scryptSync
+  // ------------------------------------------
+  admin: {
+    username: 'admin',
+    passwordHash: '308b9eb79dbd40596d99f4c31a8bfc8b:552a691dd31faa6f5cc517f3af05b293b4fe947b0a75aefd12f81396be73f4ce76cffce788568a6f1584675fbe14927ee63e68fd7cc0f5a5c7e3dd7c49a28fa3',
+  },
 };
 
 export const menuItems = siteData.menu.items;
