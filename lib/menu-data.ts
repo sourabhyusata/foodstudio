@@ -62,7 +62,7 @@ export const siteData = {
   // ------------------------------------------
   admin: {
     username: 'admin',
-    passwordHash: '308b9eb79dbd40596d99f4c31a8bfc8b:552a691dd31faa6f5cc517f3af05b293b4fe947b0a75aefd12f81396be73f4ce76cffce788568a6f1584675fbe14927ee63e68fd7cc0f5a5c7e3dd7c49a28fa3',
+    passwordHash: '1156269da8b4e127beaa09cdced0d57a:fa04c5e08fc4854c0100eeeace8aef53b319205f9dcf22ac5e3e86153e01ded0a09f733ced1208a1eebe4d93075194d1f1b4c6823329b49318472ad96919d760',
   },
 };
 
