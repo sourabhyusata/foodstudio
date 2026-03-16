@@ -4,12 +4,14 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, ClipboardList, UtensilsCrossed, LogOut, Menu } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, UtensilsCrossed, LogOut, Menu, Megaphone, Users } from 'lucide-react';
 
 const adminLinks = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/orders', label: 'Orders', icon: ClipboardList },
   { href: '/admin/menu', label: 'Menu Items', icon: UtensilsCrossed },
+  { href: '/admin/offers', label: 'Offers & Alerts', icon: Megaphone },
+  { href: '/admin/customers', label: 'Customers', icon: Users },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

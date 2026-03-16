@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Utensils, Clock, IndianRupee, Flame } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
 import TestimonialCarousel from '@/components/TestimonialCarousel';
+import OfferSubscribe from '@/components/OfferSubscribe';
 import HomeBestsellers from './HomeBestsellers';
 import { menuItems } from '@/lib/menu-data';
 import { MenuItem } from '@/types';
@@ -210,6 +211,35 @@ export default function HomePage() {
                 </a>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Subscribe to Offers */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div>
+              <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl text-brown-dark mb-3">
+                Never Miss a Deal
+              </h2>
+              <p className="text-gray-500 mb-6 leading-relaxed">
+                Subscribe to our offer alerts and be the first to know about discounts,
+                new menu items, and special promotions. We&apos;ll send you exclusive deals
+                right to your phone!
+              </p>
+              <div className="flex gap-4 text-sm text-gray-500">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-saffron/10 rounded-full flex items-center justify-center text-saffron">🎉</div>
+                  Exclusive Discounts
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-leaf-green/10 rounded-full flex items-center justify-center text-leaf-green">🆕</div>
+                  New Items First
+                </div>
+              </div>
+            </div>
+            <OfferSubscribe />
           </div>
         </div>
       </section>

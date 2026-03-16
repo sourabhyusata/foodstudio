@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import OfferBanner from "@/components/OfferBanner";
 
 export const metadata: Metadata = {
   title: "Dosa Darbar — Jaipur's Favorite Dosa Destination",
@@ -80,6 +81,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col">
+        <OfferBanner />
         <Navbar />
         <main className="flex-1">{children}</main>
         <CartDrawer />
